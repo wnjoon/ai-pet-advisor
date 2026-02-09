@@ -2,7 +2,7 @@
 
 > 기준 문서: [SPEC_v3.md](./SPEC_v3.md) | [RULES.md](./RULES.md)
 > 최종 업데이트: 2026-02-09
-> 현재 단계: **Phase 1.4 L1 메모리 매니저**
+> 현재 단계: **Phase 1.5 L2 메모리 매니저 + Reconciliation**
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
-| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 37% |
+| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 50% |
 | Phase 2 | 카카오톡 연동 | 🔲 미시작 | 0% |
 | Phase 3 | Webview (Next.js) | 🔲 미시작 | 0% |
 | Phase 4 | 확장 기능 | 🔲 미시작 | 0% |
@@ -98,17 +98,17 @@
 
 ### 1.4 L1 메모리 매니저
 
-- [ ] Repository (`internal/repository/memory_repo.go`)
-  - [ ] L1 조회: GetCategoryContext(dogID, category)
-  - [ ] L1 전체 조회: GetAllCategoryContexts(dogID)
-  - [ ] L1 저장: UpsertCategoryContext(context)
-- [ ] Service (`internal/service/memory_manager.go`)
-  - [ ] **AppendToL1(dogID, category, snippet)**: L1에 ChatSnippet 추가
-    - [ ] MaxItems 초과 시 가장 오래된 항목 반환 (L2 전이용)
-    - [ ] JSONB 배열에 append + 길이 제한 적용
-  - [ ] **GetRecentContext(dogID, category)**: 특정 카테고리의 최근 문맥 조회
-  - [ ] **GetAllRecentContexts(dogID)**: 전체 카테고리 문맥 조회
-  - [ ] MaxItems 설정 기능 (향후 티어 시스템용)
+- [x] Repository (`internal/repository/memory_repo.go`)
+  - [x] L1 조회: GetCategoryContext(dogID, category)
+  - [x] L1 전체 조회: GetAllCategoryContexts(dogID)
+  - [x] L1 저장: UpsertCategoryContext(context)
+- [x] Service (`internal/service/memory_manager.go`)
+  - [x] **AppendToL1(dogID, category, snippet)**: L1에 ChatSnippet 추가
+    - [x] MaxItems 초과 시 가장 오래된 항목 반환 (L2 전이용)
+    - [x] JSONB 배열에 append + 길이 제한 적용
+  - [x] **GetRecentContext(dogID, category)**: 특정 카테고리의 최근 문맥 조회
+  - [x] **GetAllRecentContexts(dogID)**: 전체 카테고리 문맥 조회
+  - [x] MaxItems 설정 기능 (향후 티어 시스템용)
 
 ### 1.5 L2 메모리 매니저 + Reconciliation
 
@@ -422,4 +422,5 @@ Phase 1.1 프로젝트 세팅
 | 2026-02-09 | Phase 1.1 프로젝트 초기 세팅 | Go 모듈, Gin 서버, config, 디렉토리 구조 | GORM/uuid/ADK는 사용 시 추가 예정 |
 | 2026-02-09 | Phase 1.2 DB 모델 및 마이그레이션 | domain 4파일, AutoMigrate, JSONB 타입 | DB명 ai_pet_advisor로 변경 |
 | 2026-02-09 | Phase 1.3 반려견 CRUD API | repo/service/handler, User+Dog CRUD | Birthday 추정, L1/L2 초기화, 유효성검사 |
+| 2026-02-09 | Phase 1.4 L1 메모리 매니저 | memory_repo, memory_manager | AppendToL1 eviction, MaxItems 관리 |
 | | | | |
