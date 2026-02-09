@@ -2,7 +2,7 @@
 
 > 기준 문서: [SPEC_v3.md](./SPEC_v3.md) | [RULES.md](./RULES.md)
 > 최종 업데이트: 2026-02-09
-> 현재 단계: **Phase 1.5 L2 메모리 매니저 + Reconciliation**
+> 현재 단계: **Phase 1.6 ADK 에이전트 정의**
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
-| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 50% |
+| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 62% |
 | Phase 2 | 카카오톡 연동 | 🔲 미시작 | 0% |
 | Phase 3 | Webview (Next.js) | 🔲 미시작 | 0% |
 | Phase 4 | 확장 기능 | 🔲 미시작 | 0% |
@@ -112,22 +112,22 @@
 
 ### 1.5 L2 메모리 매니저 + Reconciliation
 
-- [ ] Repository
-  - [ ] L2 조회: GetDynamicSummary(dogID)
-  - [ ] L2 저장: UpsertDynamicSummary(summary)
-- [ ] Service — Reconciliation 로직
-  - [ ] **ReconcileOnSessionEnd(dogID, sessionSnippets)**: 세션 종료 시 전체 요약
-    - [ ] AI에게 세션 대화 + 기존 L2 전달 → 갱신된 CategoryStatuses 수신
-    - [ ] Baseline 비교 → 일관 시 Confidence 상승
-    - [ ] 충돌 시 LatestObs에 Counter-Example 기록 + StatusTag = "Changing"
-    - [ ] Counter-Example 반복 시 Baseline 갱신 + Confidence 리셋
-    - [ ] 급격한 변화 → StatusTag = "Anomaly"
-  - [ ] **ReconcileOnOverflow(dogID, category, evictedSnippets)**: L1 초과 시 점진 압축
-    - [ ] 제거되는 항목을 L2에 반영
-    - [ ] Confidence 미세 조정
-  - [ ] Reconciliation용 Gemini 프롬프트 설계
-    - [ ] 입력: 기존 L2 CategoryStatuses + 새 대화 조각들
-    - [ ] 출력: 갱신된 CategoryStatuses JSON
+- [x] Repository
+  - [x] L2 조회: GetDynamicSummary(dogID) — 1.4에서 memory_repo.go에 구현
+  - [x] L2 저장: UpsertDynamicSummary(summary) — 1.4에서 memory_repo.go에 구현
+- [x] Service — Reconciliation 로직
+  - [x] **ReconcileOnSessionEnd(dogID, sessionSnippets)**: 세션 종료 시 전체 요약
+    - [x] AI에게 세션 대화 + 기존 L2 전달 → 갱신된 CategoryStatuses 수신
+    - [x] Baseline 비교 → 일관 시 Confidence 상승
+    - [x] 충돌 시 LatestObs에 Counter-Example 기록 + StatusTag = "Changing"
+    - [x] Counter-Example 반복 시 Baseline 갱신 + Confidence 리셋
+    - [x] 급격한 변화 → StatusTag = "Anomaly"
+  - [x] **ReconcileOnOverflow(dogID, category, evictedSnippets)**: L1 초과 시 점진 압축
+    - [x] 제거되는 항목을 L2에 반영
+    - [x] Confidence 미세 조정
+  - [x] Reconciliation용 Gemini 프롬프트 설계
+    - [x] 입력: 기존 L2 CategoryStatuses + 새 대화 조각들
+    - [x] 출력: 갱신된 CategoryStatuses JSON
 
 ### 1.6 ADK 에이전트 정의
 
@@ -423,4 +423,5 @@ Phase 1.1 프로젝트 세팅
 | 2026-02-09 | Phase 1.2 DB 모델 및 마이그레이션 | domain 4파일, AutoMigrate, JSONB 타입 | DB명 ai_pet_advisor로 변경 |
 | 2026-02-09 | Phase 1.3 반려견 CRUD API | repo/service/handler, User+Dog CRUD | Birthday 추정, L1/L2 초기화, 유효성검사 |
 | 2026-02-09 | Phase 1.4 L1 메모리 매니저 | memory_repo, memory_manager | AppendToL1 eviction, MaxItems 관리 |
+| 2026-02-09 | Phase 1.5 L2 + Reconciliation | reconciler, reconciler_prompt | AI 인터페이스 + 룰기반 폴백 + 프롬프트 |
 | | | | |
