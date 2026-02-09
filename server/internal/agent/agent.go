@@ -13,7 +13,6 @@ import (
 	"google.golang.org/adk/runner"
 	"google.golang.org/adk/session"
 	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/geminitool"
 )
 
 // AdvisorAgent wraps the ADK agent and runner for the pet advisor chatbot.
@@ -64,7 +63,6 @@ func New(ctx context.Context, cfg Config) (*AdvisorAgent, error) {
 			loadContextTool,
 			searchHistoryTool,
 			saveAndReconcileTool,
-			geminitool.GoogleSearch{},
 		},
 	})
 	if err != nil {
@@ -94,6 +92,7 @@ func New(ctx context.Context, cfg Config) (*AdvisorAgent, error) {
 // ChatRequest represents an incoming chat message.
 type ChatRequest struct {
 	UserID    string
+	DogID     string
 	SessionID string
 	Text      string
 }
@@ -120,8 +119,9 @@ func (a *AdvisorAgent) Chat(ctx context.Context, req ChatRequest) (*ChatResponse
 		sessionID = resp.Session.ID()
 	}
 
-	// Build user message
-	msg := genai.NewContentFromText(req.Text, "user")
+	// Build user message with dog_id context
+	msgText := fmt.Sprintf("[dog_id: %s]\n%s", req.DogID, req.Text)
+	msg := genai.NewContentFromText(msgText, "user")
 
 	// Run agent
 	var responseText strings.Builder

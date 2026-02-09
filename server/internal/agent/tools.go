@@ -25,7 +25,7 @@ type ToolDeps struct {
 
 // LoadContextInput is the input schema for the load_context tool.
 type LoadContextInput struct {
-	DogID string `json:"dog_id" jsonschema:"description=The unique identifier of the dog"`
+	DogID string `json:"dog_id"`
 }
 
 // LoadContextOutput is the output schema for the load_context tool.
@@ -70,9 +70,9 @@ func NewLoadContextTool(deps *ToolDeps) (tool.Tool, error) {
 
 // SearchHistoryInput is the input schema for the search_history tool.
 type SearchHistoryInput struct {
-	DogID     string  `json:"dog_id" jsonschema:"description=The unique identifier of the dog"`
-	Query     string  `json:"query" jsonschema:"description=Search keyword or phrase"`
-	Category  string  `json:"category,omitempty" jsonschema:"description=Optional category filter (식사/교육/건강/기분/수면/사회화/환경)"`
+	DogID    string `json:"dog_id"`
+	Query    string `json:"query"`
+	Category string `json:"category,omitempty"`
 }
 
 // SearchHistoryOutput is the output schema for the search_history tool.
@@ -147,12 +147,12 @@ func NewSearchHistoryTool(deps *ToolDeps) (tool.Tool, error) {
 
 // SaveAndReconcileInput is the input schema for the save_and_reconcile tool.
 type SaveAndReconcileInput struct {
-	DogID        string   `json:"dog_id" jsonschema:"description=The unique identifier of the dog"`
-	Categories   []string `json:"categories" jsonschema:"description=Categories this conversation belongs to"`
-	UserText     string   `json:"user_text" jsonschema:"description=Summary of the user's message"`
-	AIText       string   `json:"ai_text" jsonschema:"description=Summary of the AI's response"`
-	Urgency      string   `json:"urgency,omitempty" jsonschema:"description=Urgency level: L1/L2/L3/L4"`
-	BehaviorTags []string `json:"behavior_tags,omitempty" jsonschema:"description=Optional behavior tags"`
+	DogID        string   `json:"dog_id"`
+	Categories   []string `json:"categories"`
+	UserText     string   `json:"user_text"`
+	AIText       string   `json:"ai_text"`
+	Urgency      string   `json:"urgency,omitempty"`
+	BehaviorTags []string `json:"behavior_tags,omitempty"`
 }
 
 // SaveAndReconcileOutput is the output schema for the save_and_reconcile tool.

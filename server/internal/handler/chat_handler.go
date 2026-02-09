@@ -40,6 +40,7 @@ func (h *ChatHandler) Chat(c *gin.Context) {
 
 	resp, err := h.agent.Chat(c.Request.Context(), agentpkg.ChatRequest{
 		UserID:    req.UserID,
+		DogID:     req.DogID,
 		SessionID: req.SessionID,
 		Text:      req.Text,
 	})
