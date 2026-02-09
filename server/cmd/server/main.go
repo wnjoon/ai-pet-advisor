@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/wnjoon/ai-pet-advisor/server/internal/config"
+	"github.com/wnjoon/ai-pet-advisor/server/internal/repository"
 )
 
 func main() {
@@ -15,6 +16,12 @@ func main() {
 	_ = godotenv.Load()
 
 	cfg := config.Load()
+
+	// Database
+	_, err := repository.NewDB(cfg.DatabaseURL)
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
 
 	gin.SetMode(cfg.GinMode)
 	r := gin.New()

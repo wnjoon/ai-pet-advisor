@@ -1,11 +1,11 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: canine_advisor_db
+    container_name: ai_pet_advisor_db
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: canine_advisor
+      POSTGRES_DB: ai_pet_advisor
     ports:
       - "5432:5432"
     volumes:

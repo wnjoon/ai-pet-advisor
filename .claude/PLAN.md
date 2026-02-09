@@ -2,7 +2,7 @@
 
 > 기준 문서: [SPEC_v3.md](./SPEC_v3.md) | [RULES.md](./RULES.md)
 > 최종 업데이트: 2026-02-09
-> 현재 단계: **Phase 1.2 DB 모델 및 마이그레이션**
+> 현재 단계: **Phase 1.3 반려견 CRUD API**
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
-| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 12% |
+| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 25% |
 | Phase 2 | 카카오톡 연동 | 🔲 미시작 | 0% |
 | Phase 3 | Webview (Next.js) | 🔲 미시작 | 0% |
 | Phase 4 | 확장 기능 | 🔲 미시작 | 0% |
@@ -53,24 +53,24 @@
 
 ### 1.2 DB 모델 및 마이그레이션
 
-- [ ] 도메인 모델 정의 (`internal/domain/`)
-  - [ ] `user.go` — User, PlatformAccount 구조체
-  - [ ] `dog.go` — Dog 구조체 (불변/가변 필드 분리)
-    - [ ] BirthdayEstimated 플래그 포함
-  - [ ] `memory.go` — ChatSnippet, CategoryStatus, DogCategoryContext, DogDynamicSummary
-  - [ ] `session.go` — ChatSession 구조체
-- [ ] GORM AutoMigrate 연결
-  - [ ] User 테이블
-  - [ ] PlatformAccount 테이블 (스키마만, MVP 미사용)
-  - [ ] Dog 테이블
-  - [ ] DogCategoryContext 테이블 (L1)
-  - [ ] DogDynamicSummary 테이블 (L2)
-- [ ] JSONB 커스텀 타입 처리
-  - [ ] `[]ChatSnippet` ↔ JSONB 직렬화/역직렬화
-  - [ ] `[]CategoryStatus` ↔ JSONB 직렬화/역직렬화
-- [ ] 인덱스 확인
-  - [ ] `idx_dog_cat` (DogID + Category 복합 유니크)
-  - [ ] PlatformAccount의 `idx_platform_id` 유니크
+- [x] 도메인 모델 정의 (`internal/domain/`)
+  - [x] `user.go` — User, PlatformAccount 구조체
+  - [x] `dog.go` — Dog 구조체 (불변/가변 필드 분리)
+    - [x] BirthdayEstimated 플래그 포함
+  - [x] `memory.go` — ChatSnippet, CategoryStatus, DogCategoryContext, DogDynamicSummary
+  - [x] `session.go` — ChatSession 구조체
+- [x] GORM AutoMigrate 연결
+  - [x] User 테이블
+  - [x] PlatformAccount 테이블 (스키마만, MVP 미사용)
+  - [x] Dog 테이블
+  - [x] DogCategoryContext 테이블 (L1)
+  - [x] DogDynamicSummary 테이블 (L2)
+- [x] JSONB 커스텀 타입 처리
+  - [x] `[]ChatSnippet` ↔ JSONB 직렬화/역직렬화
+  - [x] `[]CategoryStatus` ↔ JSONB 직렬화/역직렬화
+- [x] 인덱스 확인
+  - [x] `idx_dog_cat` (DogID + Category 복합 유니크)
+  - [x] PlatformAccount의 `idx_platform_id` 유니크
 
 ### 1.3 반려견 CRUD API
 
@@ -420,4 +420,5 @@ Phase 1.1 프로젝트 세팅
 |------|----------|----------|------|
 | 2026-02-09 | SPEC_v3, 개발 계획서 작성 | 문서 작성 | 인터뷰 기반 스펙 확정 |
 | 2026-02-09 | Phase 1.1 프로젝트 초기 세팅 | Go 모듈, Gin 서버, config, 디렉토리 구조 | GORM/uuid/ADK는 사용 시 추가 예정 |
+| 2026-02-09 | Phase 1.2 DB 모델 및 마이그레이션 | domain 4파일, AutoMigrate, JSONB 타입 | DB명 ai_pet_advisor로 변경 |
 | | | | |

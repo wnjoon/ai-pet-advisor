@@ -37,7 +37,7 @@ func Load() *Config {
 	return &Config{
 		Port:              getEnv("PORT", "8080"),
 		GinMode:           getEnv("GIN_MODE", "debug"),
-		DatabaseURL:       getEnv("DATABASE_URL", "postgres://user:password@localhost:5432/canine_advisor?sslmode=disable"),
+		DatabaseURL:       getEnv("DATABASE_URL", "postgres://user:password@localhost:5432/ai_pet_advisor?sslmode=disable"),
 		GoogleAPIKey:      getEnv("GOOGLE_API_KEY", ""),
 		GeminiModel:       getEnv("GEMINI_MODEL", "gemini-2.5-flash"),
 		SessionTimeoutMin: getEnvInt("SESSION_TIMEOUT_MIN", 30),
