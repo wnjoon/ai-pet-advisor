@@ -426,4 +426,5 @@ Phase 1.1 프로젝트 세팅
 | 2026-02-09 | Phase 1.5 L2 + Reconciliation | reconciler, reconciler_prompt | AI 인터페이스 + 룰기반 폴백 + 프롬프트 |
 | 2026-02-09 | Phase 1.6 ADK 에이전트 | agent, tools, prompt, chat_handler | ADK v0.4.0, 강형욱 페르소나, 3 tools |
 | 2026-02-09 | Phase 1.7 세션 매니저 | session_manager | sync.Map, lazy timeout, L2 reconcile on end |
+| 2026-02-09 | 프롬프트 튜닝 | prompt.go, agent.go | 되묻기 금지, 가용 정보 기반 답변 우선, 빈 응답 수정 |
 | | | | |
