@@ -2,7 +2,7 @@
 
 > 기준 문서: [SPEC_v3.md](./SPEC_v3.md) | [RULES.md](./RULES.md)
 > 최종 업데이트: 2026-02-09
-> 현재 단계: **Phase 1.7 세션 매니저**
+> 현재 단계: **Phase 1.8 테스트**
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
-| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 75% |
+| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 87% |
 | Phase 2 | 카카오톡 연동 | 🔲 미시작 | 0% |
 | Phase 3 | Webview (Next.js) | 🔲 미시작 | 0% |
 | Phase 4 | 확장 기능 | 🔲 미시작 | 0% |
@@ -155,18 +155,18 @@
 
 ### 1.7 세션 매니저
 
-- [ ] Service (`internal/service/session_manager.go`)
-  - [ ] **CreateSession(userID, dogID, platform)**: 새 세션 생성
-  - [ ] **GetActiveSession(userID, platform)**: 활성 세션 조회
-  - [ ] **UpdateLastActive(sessionID)**: 마지막 활동 시간 갱신
-  - [ ] **EndSession(sessionID)**: 세션 종료 + save_and_reconcile 트리거
-  - [ ] **SwitchDog(sessionID, newDogID)**: 대화 중 반려견 전환
-- [ ] 타임아웃 관리
-  - [ ] 백그라운드 고루틴: 주기적(1분)으로 만료 세션 체크
-  - [ ] 또는 다음 메시지 수신 시 lazy 체크 (30분 경과 여부)
-  - [ ] 타임아웃 시 자동 save_and_reconcile 실행
-- [ ] 세션 저장소
-  - [ ] 인메모리 (sync.Map) — MVP
+- [x] Service (`internal/service/session_manager.go`)
+  - [x] **CreateSession(userID, dogID, platform)**: 새 세션 생성
+  - [x] **GetActiveSession(userID, platform)**: 활성 세션 조회
+  - [x] **UpdateLastActive(sessionID)**: 마지막 활동 시간 갱신
+  - [x] **EndSession(sessionID)**: 세션 종료 + ReconcileOnSessionEnd 트리거
+  - [x] **SwitchDog(sessionID, newDogID)**: 대화 중 반려견 전환
+- [x] 타임아웃 관리
+  - [x] 다음 메시지 수신 시 lazy 체크 (30분 경과 여부)
+  - [x] CleanupExpired() 메서드 (백그라운드 고루틴용)
+  - [x] 타임아웃 시 자동 ReconcileOnSessionEnd 실행
+- [x] 세션 저장소
+  - [x] 인메모리 (sync.Map) — MVP
   - [ ] (향후) Redis 또는 DB 영속화
 
 ### 1.8 테스트
@@ -424,5 +424,6 @@ Phase 1.1 프로젝트 세팅
 | 2026-02-09 | Phase 1.3 반려견 CRUD API | repo/service/handler, User+Dog CRUD | Birthday 추정, L1/L2 초기화, 유효성검사 |
 | 2026-02-09 | Phase 1.4 L1 메모리 매니저 | memory_repo, memory_manager | AppendToL1 eviction, MaxItems 관리 |
 | 2026-02-09 | Phase 1.5 L2 + Reconciliation | reconciler, reconciler_prompt | AI 인터페이스 + 룰기반 폴백 + 프롬프트 |
-| 2026-02-09 | Phase 1.6 ADK 에이전트 | agent, tools, prompt, chat_handler | ADK v0.4.0, 강형욱 페르소나, 3 tools, Google Search |
+| 2026-02-09 | Phase 1.6 ADK 에이전트 | agent, tools, prompt, chat_handler | ADK v0.4.0, 강형욱 페르소나, 3 tools |
+| 2026-02-09 | Phase 1.7 세션 매니저 | session_manager | sync.Map, lazy timeout, L2 reconcile on end |
 | | | | |
