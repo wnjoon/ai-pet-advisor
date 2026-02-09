@@ -31,6 +31,10 @@ Thumbs.db
 # === Docker ===
 docker-compose.override.yml
 
+# === Auto-generated Claude files (subdirectory) ===
+**/CLAUDE.md
+!.claude/CLAUDE.md
+
 # === Test ===
 coverage.out
 coverage.html

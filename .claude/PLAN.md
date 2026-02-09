@@ -2,7 +2,7 @@
 
 > 기준 문서: [SPEC_v3.md](./SPEC_v3.md) | [RULES.md](./RULES.md)
 > 최종 업데이트: 2026-02-09
-> 현재 단계: **Phase 1 시작 전**
+> 현재 단계: **Phase 1.2 DB 모델 및 마이그레이션**
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
-| Phase 1 | 백엔드 API 코어 | 🔲 미시작 | 0% |
+| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 12% |
 | Phase 2 | 카카오톡 연동 | 🔲 미시작 | 0% |
 | Phase 3 | Webview (Next.js) | 🔲 미시작 | 0% |
 | Phase 4 | 확장 기능 | 🔲 미시작 | 0% |
@@ -23,8 +23,8 @@
 
 ### 1.1 프로젝트 초기 세팅
 
-- [ ] Go 모듈 초기화 (`go mod init`)
-- [ ] 디렉토리 구조 생성
+- [x] Go 모듈 초기화 (`go mod init`)
+- [x] 디렉토리 구조 생성
   ```
   server/cmd/server/main.go
   server/internal/adapter/platform.go
@@ -36,20 +36,20 @@
   server/internal/config/
   server/migrations/
   ```
-- [ ] 핵심 의존성 설치
-  - [ ] `github.com/gin-gonic/gin` (웹 프레임워크)
-  - [ ] `gorm.io/gorm` + `gorm.io/driver/postgres` (ORM)
-  - [ ] `github.com/google/uuid` (UUID 생성)
-  - [ ] Google ADK for Go SDK
-- [ ] 설정 관리 구조 (`internal/config/config.go`)
-  - [ ] 환경변수 로드 (PORT, DATABASE_URL, GOOGLE_API_KEY 등)
-  - [ ] SESSION_TIMEOUT_MIN, DEFAULT_MAX_ITEMS 설정
-- [ ] Gin 서버 기본 라우터 세팅 (`cmd/server/main.go`)
-  - [ ] Health check 엔드포인트 (`GET /health`)
-  - [ ] 미들웨어 (CORS, Logger, Recovery)
-- [ ] Docker Compose 로컬 개발 환경
-  - [ ] PostgreSQL 컨테이너
-  - [ ] (선택) Go 서버 컨테이너
+- [x] 핵심 의존성 설치
+  - [x] `github.com/gin-gonic/gin` (웹 프레임워크)
+  - [ ] `gorm.io/gorm` + `gorm.io/driver/postgres` → 1.2에서 import 시 추가
+  - [ ] `github.com/google/uuid` → 1.2에서 import 시 추가
+  - [ ] Google ADK for Go SDK → 1.6에서 import 시 추가
+- [x] 설정 관리 구조 (`internal/config/config.go`)
+  - [x] 환경변수 로드 (PORT, DATABASE_URL, GOOGLE_API_KEY 등)
+  - [x] SESSION_TIMEOUT_MIN, DEFAULT_MAX_ITEMS 설정
+- [x] Gin 서버 기본 라우터 세팅 (`cmd/server/main.go`)
+  - [x] Health check 엔드포인트 (`GET /health`)
+  - [x] 미들웨어 (CORS, Logger, Recovery)
+- [x] Docker Compose 로컬 개발 환경
+  - [x] PostgreSQL 컨테이너
+  - [x] (선택) Go 서버 컨테이너 — 스킵, 로컬 직접 실행
 
 ### 1.2 DB 모델 및 마이그레이션
 
@@ -419,4 +419,5 @@ Phase 1.1 프로젝트 세팅
 | 날짜 | 작업 내용 | 완료 항목 | 메모 |
 |------|----------|----------|------|
 | 2026-02-09 | SPEC_v3, 개발 계획서 작성 | 문서 작성 | 인터뷰 기반 스펙 확정 |
+| 2026-02-09 | Phase 1.1 프로젝트 초기 세팅 | Go 모듈, Gin 서버, config, 디렉토리 구조 | GORM/uuid/ADK는 사용 시 추가 예정 |
 | | | | |
