@@ -110,10 +110,21 @@ type ChatResponse struct {
 
 // Chat sends a message to the agent and returns the response.
 func (a *AdvisorAgent) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, error) {
-	// Ensure session exists
+	// Ensure ADK session exists
 	sessionID := req.SessionID
+	if sessionID != "" {
+		// Check if the session exists in ADK's session service
+		_, err := a.sessionService.Get(ctx, &session.GetRequest{
+			AppName:   a.appName,
+			UserID:    req.UserID,
+			SessionID: sessionID,
+		})
+		if err != nil {
+			// Session not found in ADK (e.g. server restart) - create new one
+			sessionID = ""
+		}
+	}
 	if sessionID == "" {
-		// Create new session
 		resp, err := a.sessionService.Create(ctx, &session.CreateRequest{
 			AppName: a.appName,
 			UserID:  req.UserID,

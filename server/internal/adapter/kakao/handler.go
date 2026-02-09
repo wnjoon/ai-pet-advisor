@@ -84,16 +84,6 @@ func (h *Handler) HandleSkill(c *gin.Context) {
 func (h *Handler) handleChat(c *gin.Context, req *KakaoRequest, user *domain.User) {
 	callbackURL := req.UserRequest.CallbackURL
 
-	if callbackURL == "" {
-		// No callback URL - respond synchronously (should not happen in production)
-		// For safety, just return a simple text
-		c.JSON(http.StatusOK, NewSimpleTextResponse("죄송합니다. 다시 시도해주세요."))
-		return
-	}
-
-	// Immediately respond with callback acknowledgment
-	c.JSON(http.StatusOK, NewCallbackAck("잠시만 기다려주세요, 답변을 준비하고 있어요 🐾"))
-
 	// Get active dog for this user's session
 	sess := h.deps.SessionManager.GetActiveSession(user.ID, "kakao")
 	var dogID string
@@ -104,7 +94,13 @@ func (h *Handler) handleChat(c *gin.Context, req *KakaoRequest, user *domain.Use
 		dogs, err := h.deps.DogService.GetDogsByUser(user.ID)
 		if err != nil || len(dogs) == 0 {
 			// No dogs registered
-			h.sendCallback(callbackURL, NewSimpleTextResponse("등록된 반려견이 없습니다. 먼저 반려견을 등록해주세요."))
+			resp := NewSimpleTextResponse("등록된 반려견이 없습니다. 먼저 반려견을 등록해주세요.")
+			if callbackURL != "" {
+				c.JSON(http.StatusOK, NewCallbackAck("확인 중입니다..."))
+				h.sendCallback(callbackURL, resp)
+			} else {
+				c.JSON(http.StatusOK, resp)
+			}
 			return
 		}
 		dogID = dogs[0].ID
@@ -113,6 +109,17 @@ func (h *Handler) handleChat(c *gin.Context, req *KakaoRequest, user *domain.Use
 
 	// Update session activity
 	h.deps.SessionManager.UpdateLastActive(sess.SessionID)
+
+	if callbackURL == "" {
+		// No callback URL: KakaoTalk requires response within 5s, but AI+tools need more time.
+		// This path is only hit when callback is not enabled in OpenBuilder.
+		// Return a guide message instead of attempting a timeout-prone AI call.
+		c.JSON(http.StatusOK, NewSimpleTextResponse("응답 준비에 시간이 필요합니다. 잠시 후 다시 시도해주세요.\n\n(운영자: OpenBuilder에서 '콜백 사용'을 활성화해주세요)"))
+		return
+	}
+
+	// Async mode: immediately respond with callback acknowledgment
+	c.JSON(http.StatusOK, NewCallbackAck("잠시만 기다려주세요, 답변을 준비하고 있어요 🐾"))
 
 	// Run AI agent asynchronously
 	go func() {
