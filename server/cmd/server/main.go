@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	agentpkg "github.com/wnjoon/ai-pet-advisor/server/internal/agent"
 	"github.com/wnjoon/ai-pet-advisor/server/internal/config"
 	"github.com/wnjoon/ai-pet-advisor/server/internal/handler"
 	"github.com/wnjoon/ai-pet-advisor/server/internal/repository"
@@ -18,6 +20,7 @@ func main() {
 	_ = godotenv.Load()
 
 	cfg := config.Load()
+	ctx := context.Background()
 
 	// Database
 	db, err := repository.NewDB(cfg.DatabaseURL)
@@ -28,10 +31,44 @@ func main() {
 	// Repositories
 	userRepo := repository.NewUserRepository(db)
 	dogRepo := repository.NewDogRepository(db)
+	memoryRepo := repository.NewMemoryRepository(db)
 
 	// Services
 	userService := service.NewUserService(userRepo)
 	dogService := service.NewDogService(dogRepo, userRepo)
+	memoryManager := service.NewMemoryManager(memoryRepo)
+
+	// Reconciler (with AI if API key is set, otherwise rule-based fallback)
+	var reconciliationAI service.ReconciliationAI
+	if cfg.GoogleAPIKey != "" {
+		ai, err := service.NewGeminiReconciliationAI(ctx, cfg.GoogleAPIKey, cfg.GeminiModel)
+		if err != nil {
+			log.Printf("Warning: failed to create Gemini reconciliation AI, using fallback: %v", err)
+		} else {
+			reconciliationAI = ai
+		}
+	}
+	reconciler := service.NewReconciler(memoryRepo, reconciliationAI)
+
+	// ADK Agent (optional: only if API key is configured)
+	var chatHandler *handler.ChatHandler
+	if cfg.GoogleAPIKey != "" {
+		advisorAgent, err := agentpkg.New(ctx, agentpkg.Config{
+			GoogleAPIKey: cfg.GoogleAPIKey,
+			GeminiModel:  cfg.GeminiModel,
+			Deps: &agentpkg.ToolDeps{
+				DogRepo:       dogRepo,
+				MemoryManager: memoryManager,
+				Reconciler:    reconciler,
+				MemoryRepo:    memoryRepo,
+			},
+		})
+		if err != nil {
+			log.Printf("Warning: failed to create ADK agent: %v", err)
+		} else {
+			chatHandler = handler.NewChatHandler(advisorAgent)
+		}
+	}
 
 	// Handlers
 	userHandler := handler.NewUserHandler(userService)
@@ -62,6 +99,9 @@ func main() {
 	api := r.Group("/api")
 	userHandler.RegisterRoutes(api)
 	dogHandler.RegisterRoutes(api)
+	if chatHandler != nil {
+		chatHandler.RegisterRoutes(api)
+	}
 
 	// Start server
 	addr := ":" + cfg.Port

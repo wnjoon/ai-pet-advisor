@@ -2,7 +2,7 @@
 
 > 기준 문서: [SPEC_v3.md](./SPEC_v3.md) | [RULES.md](./RULES.md)
 > 최종 업데이트: 2026-02-09
-> 현재 단계: **Phase 1.6 ADK 에이전트 정의**
+> 현재 단계: **Phase 1.7 세션 매니저**
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
-| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 62% |
+| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 75% |
 | Phase 2 | 카카오톡 연동 | 🔲 미시작 | 0% |
 | Phase 3 | Webview (Next.js) | 🔲 미시작 | 0% |
 | Phase 4 | 확장 기능 | 🔲 미시작 | 0% |
@@ -131,27 +131,27 @@
 
 ### 1.6 ADK 에이전트 정의
 
-- [ ] Google ADK 초기화 (`internal/agent/agent.go`)
-  - [ ] Gemini Flash 모델 연결
-  - [ ] Google Search Grounding 활성화
-- [ ] 강형욱 페르소나 시스템 프롬프트 (`internal/agent/prompt.go`)
-  - [ ] 어조, 스타일 가이드라인
-  - [ ] 과거 이력 참조 지시
-  - [ ] Self-Correction 지시 (L1/L2 충돌 시 질문)
-  - [ ] 긴급도 판단 기준 (L1~L4)
-  - [ ] 카테고리 자동 분류 + 복합 태깅 지시
-- [ ] 도구 3개 정의 (`internal/agent/tools.go`)
-  - [ ] **load_context**: Dog Profile + L1 + L2 로드
-    - [ ] 입력 스키마: `{ dog_id: string }`
-    - [ ] 구현: dog_repo + memory_repo 조합
-  - [ ] **search_history**: 과거 대화 검색
-    - [ ] 입력 스키마: `{ dog_id, query, category?, time_range? }`
-    - [ ] 구현: L1 RecentItems에서 키워드 매칭 + L2 Baseline 반환
-  - [ ] **save_and_reconcile**: 대화 저장 + L2 갱신
-    - [ ] 입력 스키마: `{ dog_id, category[], snippets[], urgency, behavior_tags? }`
-    - [ ] 구현: L1 저장 + ReconcileOnSessionEnd 호출
-- [ ] 에이전트 실행 파이프라인
-  - [ ] 메시지 수신 → load_context 자동 호출 → AI 응답 생성 → L1 즉시 저장
+- [x] Google ADK 초기화 (`internal/agent/agent.go`)
+  - [x] Gemini Flash 모델 연결
+  - [x] Google Search Grounding 활성화
+- [x] 강형욱 페르소나 시스템 프롬프트 (`internal/agent/prompt.go`)
+  - [x] 어조, 스타일 가이드라인
+  - [x] 과거 이력 참조 지시
+  - [x] Self-Correction 지시 (L1/L2 충돌 시 질문)
+  - [x] 긴급도 판단 기준 (L1~L4)
+  - [x] 카테고리 자동 분류 + 복합 태깅 지시
+- [x] 도구 3개 정의 (`internal/agent/tools.go`)
+  - [x] **load_context**: Dog Profile + L1 + L2 로드
+    - [x] 입력 스키마: `{ dog_id: string }`
+    - [x] 구현: dog_repo + memory_repo 조합
+  - [x] **search_history**: 과거 대화 검색
+    - [x] 입력 스키마: `{ dog_id, query, category?, time_range? }`
+    - [x] 구현: L1 RecentItems에서 키워드 매칭 + L2 Baseline 반환
+  - [x] **save_and_reconcile**: 대화 저장 + L2 갱신
+    - [x] 입력 스키마: `{ dog_id, category[], snippets[], urgency, behavior_tags? }`
+    - [x] 구현: L1 저장 + ReconcileOnOverflow 호출
+- [x] 에이전트 실행 파이프라인
+  - [x] 메시지 수신 → load_context 자동 호출 → AI 응답 생성 → L1 즉시 저장
 
 ### 1.7 세션 매니저
 
@@ -424,4 +424,5 @@ Phase 1.1 프로젝트 세팅
 | 2026-02-09 | Phase 1.3 반려견 CRUD API | repo/service/handler, User+Dog CRUD | Birthday 추정, L1/L2 초기화, 유효성검사 |
 | 2026-02-09 | Phase 1.4 L1 메모리 매니저 | memory_repo, memory_manager | AppendToL1 eviction, MaxItems 관리 |
 | 2026-02-09 | Phase 1.5 L2 + Reconciliation | reconciler, reconciler_prompt | AI 인터페이스 + 룰기반 폴백 + 프롬프트 |
+| 2026-02-09 | Phase 1.6 ADK 에이전트 | agent, tools, prompt, chat_handler | ADK v0.4.0, 강형욱 페르소나, 3 tools, Google Search |
 | | | | |
