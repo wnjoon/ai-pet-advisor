@@ -123,16 +123,17 @@ func (a *AdvisorAgent) Chat(ctx context.Context, req ChatRequest) (*ChatResponse
 	msgText := fmt.Sprintf("[dog_id: %s]\n%s", req.DogID, req.Text)
 	msg := genai.NewContentFromText(msgText, "user")
 
-	// Run agent
+	// Run agent and collect response text from all agent events
 	var responseText strings.Builder
 	for event, err := range a.runner.Run(ctx, req.UserID, sessionID, msg, agent.RunConfig{}) {
 		if err != nil {
 			return nil, fmt.Errorf("agent error: %w", err)
 		}
-		if event == nil {
+		if event == nil || event.Content == nil {
 			continue
 		}
-		if event.Author == "canine_advisor" && event.Content != nil {
+		// Collect text from agent (not user) events
+		if event.Author != "user" {
 			for _, part := range event.Content.Parts {
 				if part.Text != "" && !part.Thought {
 					responseText.WriteString(part.Text)
@@ -141,8 +142,13 @@ func (a *AdvisorAgent) Chat(ctx context.Context, req ChatRequest) (*ChatResponse
 		}
 	}
 
+	result := strings.TrimSpace(responseText.String())
+	if result == "" {
+		return nil, fmt.Errorf("agent returned empty response")
+	}
+
 	return &ChatResponse{
-		Text:      responseText.String(),
+		Text:      result,
 		SessionID: sessionID,
 	}, nil
 }
