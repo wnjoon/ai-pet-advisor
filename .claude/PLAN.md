@@ -2,7 +2,7 @@
 
 > 기준 문서: [SPEC_v3.md](./SPEC_v3.md) | [RULES.md](./RULES.md)
 > 최종 업데이트: 2026-02-09
-> 현재 단계: **Phase 1.3 반려견 CRUD API**
+> 현재 단계: **Phase 1.4 L1 메모리 매니저**
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
-| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 25% |
+| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 37% |
 | Phase 2 | 카카오톡 연동 | 🔲 미시작 | 0% |
 | Phase 3 | Webview (Next.js) | 🔲 미시작 | 0% |
 | Phase 4 | 확장 기능 | 🔲 미시작 | 0% |
@@ -74,27 +74,27 @@
 
 ### 1.3 반려견 CRUD API
 
-- [ ] Repository 계층 (`internal/repository/`)
-  - [ ] `dog_repo.go` — Create, GetByID, GetByUserID, Update, Delete
-  - [ ] `user_repo.go` — Create, GetByID, GetByPlatformID
-- [ ] Service 계층 (`internal/service/dog_service.go`)
-  - [ ] 반려견 등록 (Birthday 추정 로직 포함)
-    - [ ] 정확한 생일 입력 시: 그대로 저장, `BirthdayEstimated = false`
-    - [ ] 개월 수 입력 시: N개월 전 1일로 변환, `BirthdayEstimated = true`
-  - [ ] 반려견 조회 (단건, 사용자별 목록)
-  - [ ] 반려견 수정 (가변 필드만: weight, neutered, profile_photo, medical_notes)
-  - [ ] 반려견 삭제
-  - [ ] 등록 시 L1(7개 카테고리 빈 컨텍스트) + L2(빈 DynamicSummary) 자동 생성
-- [ ] API 핸들러 (Gin 라우터)
-  - [ ] `POST /api/dogs` — 반려견 등록
-  - [ ] `GET /api/dogs/:id` — 반려견 단건 조회
-  - [ ] `GET /api/users/:user_id/dogs` — 사용자의 반려견 목록
-  - [ ] `PATCH /api/dogs/:id` — 반려견 정보 수정
-  - [ ] `DELETE /api/dogs/:id` — 반려견 삭제
-- [ ] 입력 유효성 검사
-  - [ ] 필수 필드 (name, breed, gender)
-  - [ ] 생일: birthday 또는 age_months 중 하나 필수
-  - [ ] weight > 0
+- [x] Repository 계층 (`internal/repository/`)
+  - [x] `dog_repo.go` — Create, GetByID, GetByUserID, Update, Delete
+  - [x] `user_repo.go` — Create, GetByID, GetByPlatformID
+- [x] Service 계층 (`internal/service/dog_service.go`)
+  - [x] 반려견 등록 (Birthday 추정 로직 포함)
+    - [x] 정확한 생일 입력 시: 그대로 저장, `BirthdayEstimated = false`
+    - [x] 개월 수 입력 시: N개월 전 1일로 변환, `BirthdayEstimated = true`
+  - [x] 반려견 조회 (단건, 사용자별 목록)
+  - [x] 반려견 수정 (가변 필드만: weight, neutered, profile_photo, medical_notes)
+  - [x] 반려견 삭제
+  - [x] 등록 시 L1(7개 카테고리 빈 컨텍스트) + L2(빈 DynamicSummary) 자동 생성
+- [x] API 핸들러 (Gin 라우터)
+  - [x] `POST /api/dogs` — 반려견 등록
+  - [x] `GET /api/dogs/:id` — 반려견 단건 조회
+  - [x] `GET /api/users/:user_id/dogs` — 사용자의 반려견 목록
+  - [x] `PATCH /api/dogs/:id` — 반려견 정보 수정
+  - [x] `DELETE /api/dogs/:id` — 반려견 삭제
+- [x] 입력 유효성 검사
+  - [x] 필수 필드 (name, breed, gender)
+  - [x] 생일: birthday 또는 age_months 중 하나 필수
+  - [x] weight > 0
 
 ### 1.4 L1 메모리 매니저
 
@@ -421,4 +421,5 @@ Phase 1.1 프로젝트 세팅
 | 2026-02-09 | SPEC_v3, 개발 계획서 작성 | 문서 작성 | 인터뷰 기반 스펙 확정 |
 | 2026-02-09 | Phase 1.1 프로젝트 초기 세팅 | Go 모듈, Gin 서버, config, 디렉토리 구조 | GORM/uuid/ADK는 사용 시 추가 예정 |
 | 2026-02-09 | Phase 1.2 DB 모델 및 마이그레이션 | domain 4파일, AutoMigrate, JSONB 타입 | DB명 ai_pet_advisor로 변경 |
+| 2026-02-09 | Phase 1.3 반려견 CRUD API | repo/service/handler, User+Dog CRUD | Birthday 추정, L1/L2 초기화, 유효성검사 |
 | | | | |

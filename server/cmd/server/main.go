@@ -8,7 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/wnjoon/ai-pet-advisor/server/internal/config"
+	"github.com/wnjoon/ai-pet-advisor/server/internal/handler"
 	"github.com/wnjoon/ai-pet-advisor/server/internal/repository"
+	"github.com/wnjoon/ai-pet-advisor/server/internal/service"
 )
 
 func main() {
@@ -18,11 +20,24 @@ func main() {
 	cfg := config.Load()
 
 	// Database
-	_, err := repository.NewDB(cfg.DatabaseURL)
+	db, err := repository.NewDB(cfg.DatabaseURL)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
+	// Repositories
+	userRepo := repository.NewUserRepository(db)
+	dogRepo := repository.NewDogRepository(db)
+
+	// Services
+	userService := service.NewUserService(userRepo)
+	dogService := service.NewDogService(dogRepo, userRepo)
+
+	// Handlers
+	userHandler := handler.NewUserHandler(userService)
+	dogHandler := handler.NewDogHandler(dogService)
+
+	// Router
 	gin.SetMode(cfg.GinMode)
 	r := gin.New()
 
@@ -42,6 +57,11 @@ func main() {
 			"status": "ok",
 		})
 	})
+
+	// API routes
+	api := r.Group("/api")
+	userHandler.RegisterRoutes(api)
+	dogHandler.RegisterRoutes(api)
 
 	// Start server
 	addr := ":" + cfg.Port
