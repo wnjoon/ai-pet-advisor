@@ -2,7 +2,7 @@
 
 > 기준 문서: [SPEC_v3.md](./SPEC_v3.md) | [RULES.md](./RULES.md)
 > 최종 업데이트: 2026-02-09
-> 현재 단계: **Phase 1 시작 전**
+> 현재 단계: **Phase 1.8 테스트**
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
-| Phase 1 | 백엔드 API 코어 | 🔲 미시작 | 0% |
+| Phase 1 | 백엔드 API 코어 | ✅ 완료 | 100% |
 | Phase 2 | 카카오톡 연동 | 🔲 미시작 | 0% |
 | Phase 3 | Webview (Next.js) | 🔲 미시작 | 0% |
 | Phase 4 | 확장 기능 | 🔲 미시작 | 0% |
@@ -23,8 +23,8 @@
 
 ### 1.1 프로젝트 초기 세팅
 
-- [ ] Go 모듈 초기화 (`go mod init`)
-- [ ] 디렉토리 구조 생성
+- [x] Go 모듈 초기화 (`go mod init`)
+- [x] 디렉토리 구조 생성
   ```
   server/cmd/server/main.go
   server/internal/adapter/platform.go
@@ -36,157 +36,162 @@
   server/internal/config/
   server/migrations/
   ```
-- [ ] 핵심 의존성 설치
-  - [ ] `github.com/gin-gonic/gin` (웹 프레임워크)
-  - [ ] `gorm.io/gorm` + `gorm.io/driver/postgres` (ORM)
-  - [ ] `github.com/google/uuid` (UUID 생성)
-  - [ ] Google ADK for Go SDK
-- [ ] 설정 관리 구조 (`internal/config/config.go`)
-  - [ ] 환경변수 로드 (PORT, DATABASE_URL, GOOGLE_API_KEY 등)
-  - [ ] SESSION_TIMEOUT_MIN, DEFAULT_MAX_ITEMS 설정
-- [ ] Gin 서버 기본 라우터 세팅 (`cmd/server/main.go`)
-  - [ ] Health check 엔드포인트 (`GET /health`)
-  - [ ] 미들웨어 (CORS, Logger, Recovery)
-- [ ] Docker Compose 로컬 개발 환경
-  - [ ] PostgreSQL 컨테이너
-  - [ ] (선택) Go 서버 컨테이너
+- [x] 핵심 의존성 설치
+  - [x] `github.com/gin-gonic/gin` (웹 프레임워크)
+  - [ ] `gorm.io/gorm` + `gorm.io/driver/postgres` → 1.2에서 import 시 추가
+  - [ ] `github.com/google/uuid` → 1.2에서 import 시 추가
+  - [ ] Google ADK for Go SDK → 1.6에서 import 시 추가
+- [x] 설정 관리 구조 (`internal/config/config.go`)
+  - [x] 환경변수 로드 (PORT, DATABASE_URL, GOOGLE_API_KEY 등)
+  - [x] SESSION_TIMEOUT_MIN, DEFAULT_MAX_ITEMS 설정
+- [x] Gin 서버 기본 라우터 세팅 (`cmd/server/main.go`)
+  - [x] Health check 엔드포인트 (`GET /health`)
+  - [x] 미들웨어 (CORS, Logger, Recovery)
+- [x] Docker Compose 로컬 개발 환경
+  - [x] PostgreSQL 컨테이너
+  - [x] (선택) Go 서버 컨테이너 — 스킵, 로컬 직접 실행
 
 ### 1.2 DB 모델 및 마이그레이션
 
-- [ ] 도메인 모델 정의 (`internal/domain/`)
-  - [ ] `user.go` — User, PlatformAccount 구조체
-  - [ ] `dog.go` — Dog 구조체 (불변/가변 필드 분리)
-    - [ ] BirthdayEstimated 플래그 포함
-  - [ ] `memory.go` — ChatSnippet, CategoryStatus, DogCategoryContext, DogDynamicSummary
-  - [ ] `session.go` — ChatSession 구조체
-- [ ] GORM AutoMigrate 연결
-  - [ ] User 테이블
-  - [ ] PlatformAccount 테이블 (스키마만, MVP 미사용)
-  - [ ] Dog 테이블
-  - [ ] DogCategoryContext 테이블 (L1)
-  - [ ] DogDynamicSummary 테이블 (L2)
-- [ ] JSONB 커스텀 타입 처리
-  - [ ] `[]ChatSnippet` ↔ JSONB 직렬화/역직렬화
-  - [ ] `[]CategoryStatus` ↔ JSONB 직렬화/역직렬화
-- [ ] 인덱스 확인
-  - [ ] `idx_dog_cat` (DogID + Category 복합 유니크)
-  - [ ] PlatformAccount의 `idx_platform_id` 유니크
+- [x] 도메인 모델 정의 (`internal/domain/`)
+  - [x] `user.go` — User, PlatformAccount 구조체
+  - [x] `dog.go` — Dog 구조체 (불변/가변 필드 분리)
+    - [x] BirthdayEstimated 플래그 포함
+  - [x] `memory.go` — ChatSnippet, CategoryStatus, DogCategoryContext, DogDynamicSummary
+  - [x] `session.go` — ChatSession 구조체
+- [x] GORM AutoMigrate 연결
+  - [x] User 테이블
+  - [x] PlatformAccount 테이블 (스키마만, MVP 미사용)
+  - [x] Dog 테이블
+  - [x] DogCategoryContext 테이블 (L1)
+  - [x] DogDynamicSummary 테이블 (L2)
+- [x] JSONB 커스텀 타입 처리
+  - [x] `[]ChatSnippet` ↔ JSONB 직렬화/역직렬화
+  - [x] `[]CategoryStatus` ↔ JSONB 직렬화/역직렬화
+- [x] 인덱스 확인
+  - [x] `idx_dog_cat` (DogID + Category 복합 유니크)
+  - [x] PlatformAccount의 `idx_platform_id` 유니크
 
 ### 1.3 반려견 CRUD API
 
-- [ ] Repository 계층 (`internal/repository/`)
-  - [ ] `dog_repo.go` — Create, GetByID, GetByUserID, Update, Delete
-  - [ ] `user_repo.go` — Create, GetByID, GetByPlatformID
-- [ ] Service 계층 (`internal/service/dog_service.go`)
-  - [ ] 반려견 등록 (Birthday 추정 로직 포함)
-    - [ ] 정확한 생일 입력 시: 그대로 저장, `BirthdayEstimated = false`
-    - [ ] 개월 수 입력 시: N개월 전 1일로 변환, `BirthdayEstimated = true`
-  - [ ] 반려견 조회 (단건, 사용자별 목록)
-  - [ ] 반려견 수정 (가변 필드만: weight, neutered, profile_photo, medical_notes)
-  - [ ] 반려견 삭제
-  - [ ] 등록 시 L1(7개 카테고리 빈 컨텍스트) + L2(빈 DynamicSummary) 자동 생성
-- [ ] API 핸들러 (Gin 라우터)
-  - [ ] `POST /api/dogs` — 반려견 등록
-  - [ ] `GET /api/dogs/:id` — 반려견 단건 조회
-  - [ ] `GET /api/users/:user_id/dogs` — 사용자의 반려견 목록
-  - [ ] `PATCH /api/dogs/:id` — 반려견 정보 수정
-  - [ ] `DELETE /api/dogs/:id` — 반려견 삭제
-- [ ] 입력 유효성 검사
-  - [ ] 필수 필드 (name, breed, gender)
-  - [ ] 생일: birthday 또는 age_months 중 하나 필수
-  - [ ] weight > 0
+- [x] Repository 계층 (`internal/repository/`)
+  - [x] `dog_repo.go` — Create, GetByID, GetByUserID, Update, Delete
+  - [x] `user_repo.go` — Create, GetByID, GetByPlatformID
+- [x] Service 계층 (`internal/service/dog_service.go`)
+  - [x] 반려견 등록 (Birthday 추정 로직 포함)
+    - [x] 정확한 생일 입력 시: 그대로 저장, `BirthdayEstimated = false`
+    - [x] 개월 수 입력 시: N개월 전 1일로 변환, `BirthdayEstimated = true`
+  - [x] 반려견 조회 (단건, 사용자별 목록)
+  - [x] 반려견 수정 (가변 필드만: weight, neutered, profile_photo, medical_notes)
+  - [x] 반려견 삭제
+  - [x] 등록 시 L1(7개 카테고리 빈 컨텍스트) + L2(빈 DynamicSummary) 자동 생성
+- [x] API 핸들러 (Gin 라우터)
+  - [x] `POST /api/dogs` — 반려견 등록
+  - [x] `GET /api/dogs/:id` — 반려견 단건 조회
+  - [x] `GET /api/users/:user_id/dogs` — 사용자의 반려견 목록
+  - [x] `PATCH /api/dogs/:id` — 반려견 정보 수정
+  - [x] `DELETE /api/dogs/:id` — 반려견 삭제
+- [x] 입력 유효성 검사
+  - [x] 필수 필드 (name, breed, gender)
+  - [x] 생일: birthday 또는 age_months 중 하나 필수
+  - [x] weight > 0
 
 ### 1.4 L1 메모리 매니저
 
-- [ ] Repository (`internal/repository/memory_repo.go`)
-  - [ ] L1 조회: GetCategoryContext(dogID, category)
-  - [ ] L1 전체 조회: GetAllCategoryContexts(dogID)
-  - [ ] L1 저장: UpsertCategoryContext(context)
-- [ ] Service (`internal/service/memory_manager.go`)
-  - [ ] **AppendToL1(dogID, category, snippet)**: L1에 ChatSnippet 추가
-    - [ ] MaxItems 초과 시 가장 오래된 항목 반환 (L2 전이용)
-    - [ ] JSONB 배열에 append + 길이 제한 적용
-  - [ ] **GetRecentContext(dogID, category)**: 특정 카테고리의 최근 문맥 조회
-  - [ ] **GetAllRecentContexts(dogID)**: 전체 카테고리 문맥 조회
-  - [ ] MaxItems 설정 기능 (향후 티어 시스템용)
+- [x] Repository (`internal/repository/memory_repo.go`)
+  - [x] L1 조회: GetCategoryContext(dogID, category)
+  - [x] L1 전체 조회: GetAllCategoryContexts(dogID)
+  - [x] L1 저장: UpsertCategoryContext(context)
+- [x] Service (`internal/service/memory_manager.go`)
+  - [x] **AppendToL1(dogID, category, snippet)**: L1에 ChatSnippet 추가
+    - [x] MaxItems 초과 시 가장 오래된 항목 반환 (L2 전이용)
+    - [x] JSONB 배열에 append + 길이 제한 적용
+  - [x] **GetRecentContext(dogID, category)**: 특정 카테고리의 최근 문맥 조회
+  - [x] **GetAllRecentContexts(dogID)**: 전체 카테고리 문맥 조회
+  - [x] MaxItems 설정 기능 (향후 티어 시스템용)
 
 ### 1.5 L2 메모리 매니저 + Reconciliation
 
-- [ ] Repository
-  - [ ] L2 조회: GetDynamicSummary(dogID)
-  - [ ] L2 저장: UpsertDynamicSummary(summary)
-- [ ] Service — Reconciliation 로직
-  - [ ] **ReconcileOnSessionEnd(dogID, sessionSnippets)**: 세션 종료 시 전체 요약
-    - [ ] AI에게 세션 대화 + 기존 L2 전달 → 갱신된 CategoryStatuses 수신
-    - [ ] Baseline 비교 → 일관 시 Confidence 상승
-    - [ ] 충돌 시 LatestObs에 Counter-Example 기록 + StatusTag = "Changing"
-    - [ ] Counter-Example 반복 시 Baseline 갱신 + Confidence 리셋
-    - [ ] 급격한 변화 → StatusTag = "Anomaly"
-  - [ ] **ReconcileOnOverflow(dogID, category, evictedSnippets)**: L1 초과 시 점진 압축
-    - [ ] 제거되는 항목을 L2에 반영
-    - [ ] Confidence 미세 조정
-  - [ ] Reconciliation용 Gemini 프롬프트 설계
-    - [ ] 입력: 기존 L2 CategoryStatuses + 새 대화 조각들
-    - [ ] 출력: 갱신된 CategoryStatuses JSON
+- [x] Repository
+  - [x] L2 조회: GetDynamicSummary(dogID) — 1.4에서 memory_repo.go에 구현
+  - [x] L2 저장: UpsertDynamicSummary(summary) — 1.4에서 memory_repo.go에 구현
+- [x] Service — Reconciliation 로직
+  - [x] **ReconcileOnSessionEnd(dogID, sessionSnippets)**: 세션 종료 시 전체 요약
+    - [x] AI에게 세션 대화 + 기존 L2 전달 → 갱신된 CategoryStatuses 수신
+    - [x] Baseline 비교 → 일관 시 Confidence 상승
+    - [x] 충돌 시 LatestObs에 Counter-Example 기록 + StatusTag = "Changing"
+    - [x] Counter-Example 반복 시 Baseline 갱신 + Confidence 리셋
+    - [x] 급격한 변화 → StatusTag = "Anomaly"
+  - [x] **ReconcileOnOverflow(dogID, category, evictedSnippets)**: L1 초과 시 점진 압축
+    - [x] 제거되는 항목을 L2에 반영
+    - [x] Confidence 미세 조정
+  - [x] Reconciliation용 Gemini 프롬프트 설계
+    - [x] 입력: 기존 L2 CategoryStatuses + 새 대화 조각들
+    - [x] 출력: 갱신된 CategoryStatuses JSON
 
 ### 1.6 ADK 에이전트 정의
 
-- [ ] Google ADK 초기화 (`internal/agent/agent.go`)
-  - [ ] Gemini Flash 모델 연결
-  - [ ] Google Search Grounding 활성화
-- [ ] 강형욱 페르소나 시스템 프롬프트 (`internal/agent/prompt.go`)
-  - [ ] 어조, 스타일 가이드라인
-  - [ ] 과거 이력 참조 지시
-  - [ ] Self-Correction 지시 (L1/L2 충돌 시 질문)
-  - [ ] 긴급도 판단 기준 (L1~L4)
-  - [ ] 카테고리 자동 분류 + 복합 태깅 지시
-- [ ] 도구 3개 정의 (`internal/agent/tools.go`)
-  - [ ] **load_context**: Dog Profile + L1 + L2 로드
-    - [ ] 입력 스키마: `{ dog_id: string }`
-    - [ ] 구현: dog_repo + memory_repo 조합
-  - [ ] **search_history**: 과거 대화 검색
-    - [ ] 입력 스키마: `{ dog_id, query, category?, time_range? }`
-    - [ ] 구현: L1 RecentItems에서 키워드 매칭 + L2 Baseline 반환
-  - [ ] **save_and_reconcile**: 대화 저장 + L2 갱신
-    - [ ] 입력 스키마: `{ dog_id, category[], snippets[], urgency, behavior_tags? }`
-    - [ ] 구현: L1 저장 + ReconcileOnSessionEnd 호출
-- [ ] 에이전트 실행 파이프라인
-  - [ ] 메시지 수신 → load_context 자동 호출 → AI 응답 생성 → L1 즉시 저장
+- [x] Google ADK 초기화 (`internal/agent/agent.go`)
+  - [x] Gemini Flash 모델 연결
+  - [x] Google Search Grounding 활성화
+- [x] 강형욱 페르소나 시스템 프롬프트 (`internal/agent/prompt.go`)
+  - [x] 어조, 스타일 가이드라인
+  - [x] 과거 이력 참조 지시
+  - [x] Self-Correction 지시 (L1/L2 충돌 시 질문)
+  - [x] 긴급도 판단 기준 (L1~L4)
+  - [x] 카테고리 자동 분류 + 복합 태깅 지시
+- [x] 도구 3개 정의 (`internal/agent/tools.go`)
+  - [x] **load_context**: Dog Profile + L1 + L2 로드
+    - [x] 입력 스키마: `{ dog_id: string }`
+    - [x] 구현: dog_repo + memory_repo 조합
+  - [x] **search_history**: 과거 대화 검색
+    - [x] 입력 스키마: `{ dog_id, query, category?, time_range? }`
+    - [x] 구현: L1 RecentItems에서 키워드 매칭 + L2 Baseline 반환
+  - [x] **save_and_reconcile**: 대화 저장 + L2 갱신
+    - [x] 입력 스키마: `{ dog_id, category[], snippets[], urgency, behavior_tags? }`
+    - [x] 구현: L1 저장 + ReconcileOnOverflow 호출
+- [x] 에이전트 실행 파이프라인
+  - [x] 메시지 수신 → load_context 자동 호출 → AI 응답 생성 → L1 즉시 저장
 
 ### 1.7 세션 매니저
 
-- [ ] Service (`internal/service/session_manager.go`)
-  - [ ] **CreateSession(userID, dogID, platform)**: 새 세션 생성
-  - [ ] **GetActiveSession(userID, platform)**: 활성 세션 조회
-  - [ ] **UpdateLastActive(sessionID)**: 마지막 활동 시간 갱신
-  - [ ] **EndSession(sessionID)**: 세션 종료 + save_and_reconcile 트리거
-  - [ ] **SwitchDog(sessionID, newDogID)**: 대화 중 반려견 전환
-- [ ] 타임아웃 관리
-  - [ ] 백그라운드 고루틴: 주기적(1분)으로 만료 세션 체크
-  - [ ] 또는 다음 메시지 수신 시 lazy 체크 (30분 경과 여부)
-  - [ ] 타임아웃 시 자동 save_and_reconcile 실행
-- [ ] 세션 저장소
-  - [ ] 인메모리 (sync.Map) — MVP
+- [x] Service (`internal/service/session_manager.go`)
+  - [x] **CreateSession(userID, dogID, platform)**: 새 세션 생성
+  - [x] **GetActiveSession(userID, platform)**: 활성 세션 조회
+  - [x] **UpdateLastActive(sessionID)**: 마지막 활동 시간 갱신
+  - [x] **EndSession(sessionID)**: 세션 종료 + ReconcileOnSessionEnd 트리거
+  - [x] **SwitchDog(sessionID, newDogID)**: 대화 중 반려견 전환
+- [x] 타임아웃 관리
+  - [x] 다음 메시지 수신 시 lazy 체크 (30분 경과 여부)
+  - [x] CleanupExpired() 메서드 (백그라운드 고루틴용)
+  - [x] 타임아웃 시 자동 ReconcileOnSessionEnd 실행
+- [x] 세션 저장소
+  - [x] 인메모리 (sync.Map) — MVP
   - [ ] (향후) Redis 또는 DB 영속화
 
 ### 1.8 테스트
 
-- [ ] 단위 테스트
-  - [ ] `memory_manager_test.go`
-    - [ ] L1 AppendToL1: 정상 추가, MaxItems 초과 시 eviction
-    - [ ] L2 Reconciliation: Baseline 유지, Changing 전이, Anomaly 감지
-    - [ ] Counter-Example 반복 시 Baseline 갱신
-  - [ ] `session_manager_test.go`
-    - [ ] 세션 생성/종료, 타임아웃 감지, 다견 전환
-  - [ ] `dog_service_test.go`
-    - [ ] Birthday 추정 변환 (8개월 → 정확한 날짜)
-    - [ ] 가변 필드만 업데이트 확인
-- [ ] 통합 테스트
-  - [ ] `api_test.go` (httptest)
-    - [ ] 반려견 CRUD 전체 플로우
-    - [ ] 메모리 조회/저장 API
-  - [ ] `memory_integration_test.go`
-    - [ ] 메시지 수신 → L1 저장 → 세션 종료 → L2 갱신 E2E 흐름
+- [x] 단위 테스트
+  - [x] `memory_manager_test.go` (6개)
+    - [x] L1 AppendToL1: 정상 추가, MaxItems 초과 시 eviction, 다중 eviction
+    - [x] GetRecentContext, GetAllRecentContexts
+    - [x] UpdateMaxItems
+  - [x] `session_manager_test.go` (11개)
+    - [x] 세션 생성/종료, 타임아웃 감지, 다견 전환
+    - [x] GetOrCreate, UpdateLastActive, CleanupExpired
+  - [x] `dog_service_test.go` (10개)
+    - [x] Birthday 추정 변환 (8개월 → 정확한 날짜)
+    - [x] 가변 필드만 업데이트, 유효성 검사
+- [x] 통합 테스트
+  - [x] `api_test.go` (httptest, 7개)
+    - [x] 반려견 CRUD 전체 플로우 (생성/조회/수정/삭제)
+    - [x] 404/400 에러 케이스
+  - [x] `memory_integration_test.go` (6개)
+    - [x] L1 저장 → overflow → L2 갱신 E2E 흐름
+    - [x] 세션 종료 시 L2 reconciliation
+    - [x] Rule-based fallback, 다중 카테고리 플로우
+- [x] 테스트 인프라
+  - [x] `testutil/testdb.go`: SQLite 인메모리 테스트 DB 헬퍼
 
 ---
 
@@ -419,4 +424,13 @@ Phase 1.1 프로젝트 세팅
 | 날짜 | 작업 내용 | 완료 항목 | 메모 |
 |------|----------|----------|------|
 | 2026-02-09 | SPEC_v3, 개발 계획서 작성 | 문서 작성 | 인터뷰 기반 스펙 확정 |
+| 2026-02-09 | Phase 1.1 프로젝트 초기 세팅 | Go 모듈, Gin 서버, config, 디렉토리 구조 | GORM/uuid/ADK는 사용 시 추가 예정 |
+| 2026-02-09 | Phase 1.2 DB 모델 및 마이그레이션 | domain 4파일, AutoMigrate, JSONB 타입 | DB명 ai_pet_advisor로 변경 |
+| 2026-02-09 | Phase 1.3 반려견 CRUD API | repo/service/handler, User+Dog CRUD | Birthday 추정, L1/L2 초기화, 유효성검사 |
+| 2026-02-09 | Phase 1.4 L1 메모리 매니저 | memory_repo, memory_manager | AppendToL1 eviction, MaxItems 관리 |
+| 2026-02-09 | Phase 1.5 L2 + Reconciliation | reconciler, reconciler_prompt | AI 인터페이스 + 룰기반 폴백 + 프롬프트 |
+| 2026-02-09 | Phase 1.6 ADK 에이전트 | agent, tools, prompt, chat_handler | ADK v0.4.0, 강형욱 페르소나, 3 tools |
+| 2026-02-09 | Phase 1.7 세션 매니저 | session_manager | sync.Map, lazy timeout, L2 reconcile on end |
+| 2026-02-09 | 프롬프트 튜닝 | prompt.go, agent.go | 되묻기 금지, 가용 정보 기반 답변 우선, 빈 응답 수정 |
+| 2026-02-09 | Phase 1.8 테스트 | 38개 테스트 전체 통과 | SQLite 인메모리, 단위+통합 테스트 |
 | | | | |

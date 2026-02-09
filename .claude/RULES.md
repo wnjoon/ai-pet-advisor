@@ -42,9 +42,9 @@ canine_advisor/
 ### 2.1 브랜치 계층
 
 ```
-main                          # 프로덕션 (직접 커밋 금지)
-└── dev                       # 개발 메인 브랜치
-    ├── phase1                # Phase 1: 백엔드 API 코어
+main                              # 프로덕션 (직접 커밋 금지)
+└── dev                           # 개발 메인 브랜치
+    ├── phase1/base               # Phase 1: 백엔드 API 코어
     │   ├── phase1/1.1-project-setup
     │   ├── phase1/1.2-db-models
     │   ├── phase1/1.3-dog-crud
@@ -53,37 +53,39 @@ main                          # 프로덕션 (직접 커밋 금지)
     │   ├── phase1/1.6-adk-agent
     │   ├── phase1/1.7-session-manager
     │   └── phase1/1.8-tests
-    ├── phase2                # Phase 2: 카카오톡 연동
+    ├── phase2/base               # Phase 2: 카카오톡 연동
     │   ├── phase2/2.1-adapter-interface
     │   ├── phase2/2.2-kakao-handler
     │   ├── ...
-    ├── phase3                # Phase 3: Webview
+    ├── phase3/base               # Phase 3: Webview
     │   └── ...
-    └── phase4                # Phase 4: 확장
+    └── phase4/base               # Phase 4: 확장
         └── ...
 ```
+
+> Git은 `phase1`과 `phase1/*`이 동시에 존재할 수 없으므로, Phase 브랜치는 `phase{N}/base`로 명명한다.
 
 ### 2.2 브랜치 네이밍 규칙
 
 | 레벨 | 패턴 | 예시 |
 |------|------|------|
-| Phase 브랜치 | `phase{N}` | `phase1`, `phase2` |
+| Phase 브랜치 | `phase{N}/base` | `phase1/base`, `phase2/base` |
 | 세부 단계 브랜치 | `phase{N}/{N.M}-{kebab-case-name}` | `phase1/1.1-project-setup` |
 
 ### 2.3 브랜치 생성/머지 플로우
 
 ```
 [세부 단계 시작]
-dev → phase{N} → phase{N}/{N.M}-xxx  (브랜치 생성)
+dev → phase{N}/base → phase{N}/{N.M}-xxx  (브랜치 생성)
 
 [세부 단계 완료]
-phase{N}/{N.M}-xxx → phase{N}         (머지 후 세부 브랜치 삭제)
-phase{N} → phase{N}/{N.M+1}-yyy       (다음 단계 브랜치 생성)
+phase{N}/{N.M}-xxx → phase{N}/base     (머지 후 세부 브랜치 삭제)
+phase{N}/base → phase{N}/{N.M+1}-yyy   (다음 단계 브랜치 생성)
 
 [Phase 완료]
-phase{N} → dev                         (머지 후 Phase 브랜치 삭제)
-dev → remote push                      (원격에 push)
-dev → phase{N+1}                       (다음 Phase 브랜치 생성)
+phase{N}/base → dev                     (머지 후 Phase 브랜치 삭제)
+dev → remote push                       (원격에 push)
+dev → phase{N+1}/base                   (다음 Phase 브랜치 생성)
 ```
 
 ---
