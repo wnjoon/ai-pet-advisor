@@ -10,7 +10,7 @@
 
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
-| Phase 1 | 백엔드 API 코어 | 🔶 진행 중 | 87% |
+| Phase 1 | 백엔드 API 코어 | ✅ 완료 | 100% |
 | Phase 2 | 카카오톡 연동 | 🔲 미시작 | 0% |
 | Phase 3 | Webview (Next.js) | 🔲 미시작 | 0% |
 | Phase 4 | 확장 기능 | 🔲 미시작 | 0% |
@@ -171,22 +171,27 @@
 
 ### 1.8 테스트
 
-- [ ] 단위 테스트
-  - [ ] `memory_manager_test.go`
-    - [ ] L1 AppendToL1: 정상 추가, MaxItems 초과 시 eviction
-    - [ ] L2 Reconciliation: Baseline 유지, Changing 전이, Anomaly 감지
-    - [ ] Counter-Example 반복 시 Baseline 갱신
-  - [ ] `session_manager_test.go`
-    - [ ] 세션 생성/종료, 타임아웃 감지, 다견 전환
-  - [ ] `dog_service_test.go`
-    - [ ] Birthday 추정 변환 (8개월 → 정확한 날짜)
-    - [ ] 가변 필드만 업데이트 확인
-- [ ] 통합 테스트
-  - [ ] `api_test.go` (httptest)
-    - [ ] 반려견 CRUD 전체 플로우
-    - [ ] 메모리 조회/저장 API
-  - [ ] `memory_integration_test.go`
-    - [ ] 메시지 수신 → L1 저장 → 세션 종료 → L2 갱신 E2E 흐름
+- [x] 단위 테스트
+  - [x] `memory_manager_test.go` (6개)
+    - [x] L1 AppendToL1: 정상 추가, MaxItems 초과 시 eviction, 다중 eviction
+    - [x] GetRecentContext, GetAllRecentContexts
+    - [x] UpdateMaxItems
+  - [x] `session_manager_test.go` (11개)
+    - [x] 세션 생성/종료, 타임아웃 감지, 다견 전환
+    - [x] GetOrCreate, UpdateLastActive, CleanupExpired
+  - [x] `dog_service_test.go` (10개)
+    - [x] Birthday 추정 변환 (8개월 → 정확한 날짜)
+    - [x] 가변 필드만 업데이트, 유효성 검사
+- [x] 통합 테스트
+  - [x] `api_test.go` (httptest, 7개)
+    - [x] 반려견 CRUD 전체 플로우 (생성/조회/수정/삭제)
+    - [x] 404/400 에러 케이스
+  - [x] `memory_integration_test.go` (6개)
+    - [x] L1 저장 → overflow → L2 갱신 E2E 흐름
+    - [x] 세션 종료 시 L2 reconciliation
+    - [x] Rule-based fallback, 다중 카테고리 플로우
+- [x] 테스트 인프라
+  - [x] `testutil/testdb.go`: SQLite 인메모리 테스트 DB 헬퍼
 
 ---
 
@@ -427,4 +432,5 @@ Phase 1.1 프로젝트 세팅
 | 2026-02-09 | Phase 1.6 ADK 에이전트 | agent, tools, prompt, chat_handler | ADK v0.4.0, 강형욱 페르소나, 3 tools |
 | 2026-02-09 | Phase 1.7 세션 매니저 | session_manager | sync.Map, lazy timeout, L2 reconcile on end |
 | 2026-02-09 | 프롬프트 튜닝 | prompt.go, agent.go | 되묻기 금지, 가용 정보 기반 답변 우선, 빈 응답 수정 |
+| 2026-02-09 | Phase 1.8 테스트 | 38개 테스트 전체 통과 | SQLite 인메모리, 단위+통합 테스트 |
 | | | | |

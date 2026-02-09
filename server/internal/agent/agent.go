@@ -52,17 +52,22 @@ func New(ctx context.Context, cfg Config) (*AdvisorAgent, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create save_and_reconcile tool: %w", err)
 	}
+	updateProfileTool, err := NewUpdateProfileTool(cfg.Deps)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create update_profile tool: %w", err)
+	}
 
 	// Create the LLM agent
 	advisorAgent, err := llmagent.New(llmagent.Config{
 		Name:        "canine_advisor",
-		Description: "반려견 전담 조언자 - 강형욱 페르소나 기반 AI 어드바이저",
+		Description: "반려견 전담 조언자 - AI 어드바이저",
 		Model:       model,
 		Instruction: SystemPrompt,
 		Tools: []tool.Tool{
 			loadContextTool,
 			searchHistoryTool,
 			saveAndReconcileTool,
+			updateProfileTool,
 		},
 	})
 	if err != nil {

@@ -143,6 +143,56 @@ func NewSearchHistoryTool(deps *ToolDeps) (tool.Tool, error) {
 	}, handler)
 }
 
+// --- update_profile ---
+
+// UpdateProfileInput is the input schema for the update_profile tool.
+type UpdateProfileInput struct {
+	DogID    string   `json:"dog_id"`
+	Weight   *float64 `json:"weight,omitempty"`
+	Neutered *bool    `json:"neutered,omitempty"`
+}
+
+// UpdateProfileOutput is the output schema for the update_profile tool.
+type UpdateProfileOutput struct {
+	Updated bool        `json:"updated"`
+	Dog     *domain.Dog `json:"dog"`
+}
+
+// NewUpdateProfileTool creates the update_profile function tool.
+func NewUpdateProfileTool(deps *ToolDeps) (tool.Tool, error) {
+	handler := func(ctx tool.Context, input UpdateProfileInput) (UpdateProfileOutput, error) {
+		dog, err := deps.DogRepo.GetByID(input.DogID)
+		if err != nil {
+			return UpdateProfileOutput{}, fmt.Errorf("dog not found: %s", input.DogID)
+		}
+
+		changed := false
+		if input.Weight != nil && *input.Weight > 0 {
+			dog.Weight = *input.Weight
+			changed = true
+		}
+		if input.Neutered != nil {
+			dog.Neutered = *input.Neutered
+			changed = true
+		}
+
+		if !changed {
+			return UpdateProfileOutput{Updated: false, Dog: dog}, nil
+		}
+
+		if err := deps.DogRepo.Update(dog); err != nil {
+			return UpdateProfileOutput{}, fmt.Errorf("failed to update profile: %w", err)
+		}
+
+		return UpdateProfileOutput{Updated: true, Dog: dog}, nil
+	}
+
+	return functiontool.New(functiontool.Config{
+		Name:        "update_profile",
+		Description: "반려견 프로필의 가변 필드(몸무게, 중성화 여부)를 업데이트합니다. 사용자가 대화 중 변경을 요청할 때 호출하세요.",
+	}, handler)
+}
+
 // --- save_and_reconcile ---
 
 // SaveAndReconcileInput is the input schema for the save_and_reconcile tool.
