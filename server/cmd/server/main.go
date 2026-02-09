@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	agentpkg "github.com/wnjoon/ai-pet-advisor/server/internal/agent"
+	"github.com/wnjoon/ai-pet-advisor/server/internal/adapter/kakao"
 	"github.com/wnjoon/ai-pet-advisor/server/internal/config"
 	"github.com/wnjoon/ai-pet-advisor/server/internal/handler"
 	"github.com/wnjoon/ai-pet-advisor/server/internal/repository"
@@ -50,10 +51,15 @@ func main() {
 	}
 	reconciler := service.NewReconciler(memoryRepo, reconciliationAI)
 
+	// Session Manager
+	sessionManager := service.NewSessionManager(cfg.SessionTimeoutMin, reconciler, memoryManager)
+
 	// ADK Agent (optional: only if API key is configured)
+	var advisorAgent *agentpkg.AdvisorAgent
 	var chatHandler *handler.ChatHandler
 	if cfg.GoogleAPIKey != "" {
-		advisorAgent, err := agentpkg.New(ctx, agentpkg.Config{
+		var err error
+		advisorAgent, err = agentpkg.New(ctx, agentpkg.Config{
 			GoogleAPIKey: cfg.GoogleAPIKey,
 			GeminiModel:  cfg.GeminiModel,
 			Deps: &agentpkg.ToolDeps{
@@ -101,6 +107,18 @@ func main() {
 	dogHandler.RegisterRoutes(api)
 	if chatHandler != nil {
 		chatHandler.RegisterRoutes(api)
+	}
+
+	// KakaoTalk skill server routes
+	if advisorAgent != nil {
+		kakaoHandler := kakao.NewHandler(&kakao.HandlerDeps{
+			Agent:          advisorAgent,
+			SessionManager: sessionManager,
+			UserService:    userService,
+			DogService:     dogService,
+			APIKey:         cfg.KakaoSkillAPIKey,
+		})
+		kakaoHandler.RegisterRoutes(r)
 	}
 
 	// Start server
