@@ -2,7 +2,7 @@
 
 > 기준 문서: [SPEC_v3.md](./SPEC_v3.md) | [RULES.md](./RULES.md)
 > 최종 업데이트: 2026-02-09
-> 현재 단계: **Phase 1.8 테스트**
+> 현재 단계: **Phase 2 카카오톡 연동 (코드 완료, 실환경 테스트 대기)**
 
 ---
 
@@ -11,7 +11,7 @@
 | Phase | 설명 | 상태 | 진행률 |
 |-------|------|------|--------|
 | Phase 1 | 백엔드 API 코어 | ✅ 완료 | 100% |
-| Phase 2 | 카카오톡 연동 | 🔲 미시작 | 0% |
+| Phase 2 | 카카오톡 연동 | 🔶 진행 중 | 90% |
 | Phase 3 | Webview (Next.js) | 🔲 미시작 | 0% |
 | Phase 4 | 확장 기능 | 🔲 미시작 | 0% |
 
@@ -202,86 +202,44 @@
 
 ### 2.1 카카오 어댑터 기본 구조
 
-- [ ] Platform Adapter 인터페이스 (`internal/adapter/platform.go`)
-  ```go
-  type PlatformAdapter interface {
-      ParseRequest(ctx) (*IncomingMessage, error)
-      FormatResponse(AgentResponse) (interface{}, error)
-      SendCallback(callbackURL string, response interface{}) error
-  }
-  ```
-- [ ] IncomingMessage 공통 DTO
-  ```go
-  type IncomingMessage struct {
-      UserID    string
-      Platform  string
-      Text      string
-      CallbackURL string  // 카카오톡 전용
-      Extra     map[string]interface{}
-  }
-  ```
+- [x] Platform Adapter 인터페이스 (`internal/adapter/platform.go`) — Phase 1에서 구현
+- [x] 카카오 요청 DTO (`internal/adapter/kakao/request.go`)
+- [x] 카카오 응답 빌더 (`internal/adapter/kakao/response.go`)
 
 ### 2.2 카카오톡 핸들러 구현
 
-- [ ] 요청 DTO (`internal/adapter/kakao/request.go`)
-  - [ ] KakaoRequest 구조체 (intent, userRequest, bot, action)
-  - [ ] UserRequest 파싱 (utterance, user.id, callbackUrl)
-- [ ] 응답 DTO (`internal/adapter/kakao/response.go`)
-  - [ ] KakaoResponse 구조체 (version, template, useCallback)
-  - [ ] SimpleText 응답 빌더
-  - [ ] ListCard 응답 빌더 (반려견 목록, 메뉴)
-  - [ ] QuickReply 빌더
-  - [ ] WebLink 버튼 빌더 (병원 검색, Webview 링크)
-- [ ] HTTP 핸들러 (`internal/adapter/kakao/handler.go`)
-  - [ ] `POST /kakao/skill` — 스킬서버 메인 엔드포인트
-  - [ ] 요청 파싱 → 블록 분기 처리
-  - [ ] Fallback 블록: AI 대화 파이프라인 호출
+- [x] 요청 DTO — KakaoRequest, KakaoUserRequest, KakaoAction 등
+- [x] 응답 빌더 — SimpleText, ListCard, QuickReply, CallbackAck, ErrorResponse
+- [x] HTTP 핸들러 (`POST /kakao/skill`)
+  - [x] 요청 파싱 → 액션별 분기 (chat, menu, switch_dog)
+  - [x] Fallback → AI 대화 파이프라인 호출
 
 ### 2.3 콜백 비동기 처리
 
-- [ ] 5초 타임아웃 대응 로직
-  - [ ] 요청 수신 시 즉시 `useCallback: true` 응답
-  - [ ] 고루틴에서 AI 에이전트 실행
-  - [ ] 완료 후 callbackUrl로 POST
-- [ ] 콜백 에러 핸들링
-  - [ ] callbackUrl 1분 만료 대응 (처리 시간 60초 초과 시 타임아웃 응답)
-  - [ ] 네트워크 오류 시 재시도 (1회)
-- [ ] 빠른 응답 최적화
-  - [ ] 단순 질의(메뉴, 반려견 전환)는 5초 이내 직접 응답
-  - [ ] AI 대화만 콜백 사용
+- [x] 즉시 `useCallback: true` 응답 + 고루틴 AI 처리 + callbackUrl POST
+- [x] 55초 타임아웃 (60초 콜백 만료 대비)
+- [x] 네트워크 오류 시 재시도 (1회)
+- [x] 단순 질의(메뉴, 반려견 전환)는 직접 응답, AI 대화만 콜백
 
 ### 2.4 오픈빌더 블록 연동
 
-- [ ] Fallback 블록 → AI 자유대화 스킬 연결
-- [ ] 메뉴 블록
-  - [ ] 고정 메뉴 버튼 설정 (오픈빌더 UI에서)
-  - [ ] ListCard 메뉴 응답 (등록/프로필/리포트/반려견 전환)
-- [ ] 반려견 전환 블록
-  - [ ] 사용자 반려견 목록 조회 → ListCard 생성
-  - [ ] 선택 시 세션 DogID 전환 (SwitchDog)
-- [ ] API 키 인증
-  - [ ] 오픈빌더에서 발급한 x-api-key 검증 미들웨어
+- [x] Fallback → AI 자유대화 (handleChat)
+- [x] 메뉴 블록 — ListCard (등록/전환/리포트)
+- [x] 반려견 전환 — 목록 조회 → ListCard → SwitchDog
+- [x] x-api-key 인증 미들웨어
+- [ ] 오픈빌더 UI 설정 (사용자 작업: 스킬 서버 URL, Fallback 블록, 메뉴 블록)
 
 ### 2.5 긴급도 응답 처리
 
-- [ ] L3 (진료 권고) 응답 포맷
-  - [ ] 텍스트 강조 + 병원 검색 QuickReply (네이버 검색 링크)
-- [ ] L4 (응급) 응답 포맷
-  - [ ] 긴급 경고 텍스트 + 24시 동물병원 검색 링크
-  - [ ] Webview 대시보드 알림 플래그 저장 (DB)
+- [x] L3 — 텍스트 + "동물병원 찾기" QuickReply (네이버 검색)
+- [x] L4 — 텍스트 + "24시 동물병원 찾기" QuickReply (네이버 검색)
+- [ ] Webview 대시보드 알림 플래그 (Phase 3에서 구현)
 
 ### 2.6 카카오톡 연동 테스트
 
-- [ ] 단위 테스트
-  - [ ] 요청 DTO 파싱 정확성
-  - [ ] 응답 빌더 (SimpleText, ListCard, QuickReply) JSON 포맷 검증
-  - [ ] 콜백 처리 로직
-- [ ] 통합 테스트
-  - [ ] 스킬서버 엔드포인트 E2E (httptest)
-  - [ ] Fallback → AI 응답 → 콜백 전체 흐름
-- [ ] 실환경 테스트
-  - [ ] ngrok으로 로컬 서버 노출 → 오픈빌더 스킬 URL 연결
-  - [ ] 실제 카카오톡에서 대화 테스트
+- [x] 단위 테스트 — 응답 빌더 JSON 포맷 검증 (5개)
+- [x] 핸들러 테스트 — 긴급도 감지, 라우팅, 인증 (9개)
+- [ ] 실환경 테스트 — ngrok + 오픈빌더 연결 (사용자 작업)
 
 ---
 
@@ -433,4 +391,5 @@ Phase 1.1 프로젝트 세팅
 | 2026-02-09 | Phase 1.7 세션 매니저 | session_manager | sync.Map, lazy timeout, L2 reconcile on end |
 | 2026-02-09 | 프롬프트 튜닝 | prompt.go, agent.go | 되묻기 금지, 가용 정보 기반 답변 우선, 빈 응답 수정 |
 | 2026-02-09 | Phase 1.8 테스트 | 38개 테스트 전체 통과 | SQLite 인메모리, 단위+통합 테스트 |
+| 2026-02-09 | Phase 2 카카오톡 연동 | 어댑터, 핸들러, 콜백, 긴급도 | 52개 테스트 전체 통과 |
 | | | | |
