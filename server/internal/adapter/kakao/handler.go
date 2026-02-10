@@ -60,6 +60,9 @@ func (h *Handler) HandleSkill(c *gin.Context) {
 		return
 	}
 
+	log.Printf("[HandleSkill] action=%q utterance=%q callbackUrl=%q",
+		req.Action.Name, req.UserRequest.Utterance, req.UserRequest.CallbackURL)
+
 	kakaoUserID := req.UserRequest.User.ID
 	user, err := h.deps.UserService.GetOrCreateByPlatform("kakao", kakaoUserID)
 	if err != nil {
@@ -83,6 +86,7 @@ func (h *Handler) HandleSkill(c *gin.Context) {
 
 func (h *Handler) handleChat(c *gin.Context, req *KakaoRequest, user *domain.User) {
 	callbackURL := req.UserRequest.CallbackURL
+	log.Printf("[handleChat] callbackURL=%q, utterance=%q", callbackURL, req.UserRequest.Utterance)
 
 	// Get active dog for this user's session
 	sess := h.deps.SessionManager.GetActiveSession(user.ID, "kakao")
@@ -123,9 +127,17 @@ func (h *Handler) handleChat(c *gin.Context, req *KakaoRequest, user *domain.Use
 
 	// Run AI agent asynchronously
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("PANIC in agent goroutine: %v", r)
+				h.sendCallback(callbackURL, NewSimpleTextResponse("죄송합니다. 내부 오류가 발생했습니다. 다시 시도해주세요."))
+			}
+		}()
+
 		ctx, cancel := context.WithTimeout(context.Background(), 55*time.Second) // 55s to stay within 60s callback limit
 		defer cancel()
 
+		log.Printf("[goroutine] starting Agent.Chat for user=%s dog=%s", user.ID, dogID)
 		resp, err := h.deps.Agent.Chat(ctx, agentpkg.ChatRequest{
 			UserID:    user.ID,
 			DogID:     dogID,
@@ -138,6 +150,7 @@ func (h *Handler) handleChat(c *gin.Context, req *KakaoRequest, user *domain.Use
 			h.sendCallback(callbackURL, NewSimpleTextResponse("죄송합니다. 응답 생성 중 오류가 발생했습니다. 다시 시도해주세요."))
 			return
 		}
+		log.Printf("[goroutine] Agent.Chat completed, response length=%d", len(resp.Text))
 
 		h.sendCallback(callbackURL, formatByUrgency(resp.Text))
 	}()

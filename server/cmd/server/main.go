@@ -123,7 +123,7 @@ func main() {
 
 	// Start server
 	addr := ":" + cfg.Port
-	log.Printf("Starting server on %s", addr)
+	log.Printf("=== SERVER STARTING (build: 2026-02-10T10:57) on %s ===", addr)
 	if err := r.Run(addr); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}

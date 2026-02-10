@@ -2,6 +2,7 @@ package agent
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -38,10 +39,16 @@ type LoadContextOutput struct {
 // NewLoadContextTool creates the load_context function tool.
 func NewLoadContextTool(deps *ToolDeps) (tool.Tool, error) {
 	handler := func(ctx tool.Context, input LoadContextInput) (LoadContextOutput, error) {
+		log.Printf("[load_context] called with dog_id=%s", input.DogID)
+
 		dog, err := deps.DogRepo.GetByID(input.DogID)
 		if err != nil {
+			log.Printf("[load_context] dog not found: %s", input.DogID)
 			return LoadContextOutput{}, fmt.Errorf("dog not found: %s", input.DogID)
 		}
+
+		log.Printf("[load_context] dog=%s, breed=%s, weight=%.2fkg, birthday=%s",
+			dog.Name, dog.Breed, dog.Weight, dog.Birthday.Format("2006-01-02"))
 
 		l1Contexts, err := deps.MemoryManager.GetAllRecentContexts(input.DogID)
 		if err != nil {
@@ -52,6 +59,9 @@ func NewLoadContextTool(deps *ToolDeps) (tool.Tool, error) {
 		if err != nil {
 			return LoadContextOutput{}, fmt.Errorf("failed to load L2 summary: %w", err)
 		}
+
+		log.Printf("[load_context] returning: L1 categories=%d, L2 statuses=%d",
+			len(l1Contexts), len(l2Summary.CategoryStatuses))
 
 		return LoadContextOutput{
 			Dog:        dog,
